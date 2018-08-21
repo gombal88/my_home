@@ -6,8 +6,8 @@
 ._.DS_Store
 
 # Addons repos
-addons/homeassistant-lovelace-gen
-addons/python-lovelace
+addons/homeassistant-lovelace-gen/
+addons/python-lovelace/
 
 
 
