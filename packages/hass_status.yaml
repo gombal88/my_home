@@ -73,7 +73,7 @@ group:
       - zwave.aeotec_zw090_zstick_gen5_eu
       - zwave.bedroom_eurotronic_eur_spiritz_thermostat
       - zwave.living_room_eurotronic_eur_spiritz_thermostat
-      - zwave.thermofloor_as_heatit_thermostat_tf_021
+      - zwave.bathroom_heatit_thermostat
       - zwave.kitchen_light_fibaro_system_fgs223_double_relay
       - zwave.philio_technology_corporation_unknown_type0001_id0013
 
