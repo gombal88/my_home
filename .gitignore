@@ -5,6 +5,10 @@
 .DS_Store
 ._.DS_Store
 
+# Addons repos
+addons/homeassistant-lovelace-gen
+addons/python-lovelace
+
 
 
 # Logs
