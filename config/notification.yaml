@@ -1,0 +1,11 @@
+################################################################################
+# Notification
+# https://www.home-assistant.io/components/notify/
+################################################################################
+
+# HTML5 google cloud notifications
+# https://www.home-assistant.io/components/notify.html5/
+  - name: Google Push Notification
+    platform: html5
+    gcm_api_key: !secret gcm_api_key
+    gcm_sender_id: !secret gcm_sender_id

@@ -1,0 +1,584 @@
+################################################################################
+## Packages / Battery Alert
+##
+## https://community.home-assistant.io/t/howto-create-battery-alert-without-creating-a-template-for-every-device/30576/225
+## https://github.com/notoriousbdg/Home-AssistantConfig/blob/master/packages/battery_alert.yaml
+##
+##
+##   * Adjust Min Alert Threshold slider to the minimum battery level to alert on.
+##   * Adjust Max Alert Threshold slider to the maximum battery level to alert on.
+##
+##     Note: the input slider requires the recorder component to keep
+##     it's state through restarts. If recorder is not enabled, the threshold
+##     can be set by un-remarking `initial` and setting the preferred default.
+##
+##
+##   * To disable alerts for a specific entity, use customize to set:
+##     `battery_alert_disabled` to `true`
+##
+##     homeassistant:
+##       customize:
+##         sensor.sensor_name_to_ignore_battery:
+##           battery_alert_disabled: true
+##
+##
+################################################################################
+
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+
+    ################################################
+    ## Node Anchors
+    ################################################
+
+    package.node_anchors:
+      customize: &customize
+        package: 'battery_alert'
+
+    ################################################
+    ## Group
+    ################################################
+
+    group.battery_alert:
+      <<: *customize
+      friendly_name: "Battery Alert"
+      icon: mdi:steam
+
+    group.battery_status:
+      <<: *customize
+      friendly_name: "Battery Status"
+      icon: mdi:battery-charging
+      control: hidden
+
+    ################################################
+    ## Automation
+    ################################################
+
+    automation.battery_notification:
+      <<: *customize
+      friendly_name: "Battery Notification"
+      icon: mdi:bell-ring
+
+    automation.battery_notification_clear:
+      <<: *customize
+      friendly_name: "Battery Notification Clear"
+      icon: mdi:bell-outline
+
+    automation.battery_notification_push:
+      <<: *customize
+      friendly_name: "Battery Push Notification"
+#      icon: mdi:comment-alert-outline
+      icon: mdi:bell-ring
+
+    automation.update_battery_status_group_members:
+      <<: *customize
+      friendly_name: "Update Battery Status Group Members"
+      icon: mdi:group
+
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  battery_alert:
+    control: hidden
+    entities:
+      - input_number.battery_alert_threshold_min
+      - input_number.battery_alert_threshold_max
+      - automation.battery_notification
+      - automation.battery_notification_clear
+      - automation.battery_notification_push
+      - automation.update_battery_status_group_members
+
+
+################################################################################
+## Input Number
+################################################################################
+
+input_number:
+  battery_alert_threshold_max:
+    name: "Max Alert Threshold"
+    icon: mdi:arrow-collapse-up
+    mode: slider
+    min: -1
+    max: 100
+    # initial: 40
+
+  battery_alert_threshold_min:
+    name: "Min Alert Threshold"
+    icon: mdi:arrow-collapse-down
+    mode: slider
+    min: -1
+    max: 100
+    # initial: -1
+
+
+################################################################################
+## Sensors
+################################################################################
+
+sensor:
+  - platform: template
+    sensors:
+      battery_xiaomi_button:
+        value_template: '{{ states.binary_sensor.xiaomi_button.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Xiaomi button'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.xiaomi_button.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_bathroom_water_leak_sensor:
+        value_template: '{{ states.binary_sensor.bathroom_water_leak_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Bathroom water leak sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.bathroom_water_leak_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_kitchen_water_leak_sensor:
+        value_template: '{{ states.binary_sensor.kitchen_water_leak_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Kitchen water leak sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.kitchen_water_leak_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_hall_motion_sensor:
+        value_template: '{{ states.binary_sensor.hall_motion_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Hall motion sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.hall_motion_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_hallway_motion_sensor:
+        value_template: '{{ states.binary_sensor.hallway_motion_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Hallway motion sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.hallway_motion_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_motion_sensor_158d000204c818:
+        value_template: '{{ states.binary_sensor.motion_sensor_158d000204c818.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Motion sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.motion_sensor_158d000204c818.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_door_window_sensor:
+        value_template: '{{ states.binary_sensor.door_window_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Front door'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.door_window_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_living_room_window_sensor:
+        value_template: '{{ states.binary_sensor.living_room_window_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Living room window'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.living_room_window_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_office_window_sensor:
+        value_template: '{{ states.binary_sensor.office_window_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Office window'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.office_window_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_bedroom_window_sensor:
+        value_template: '{{ states.binary_sensor.bedroom_window_sensor.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Bedroom window'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.binary_sensor.bedroom_window_sensor.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_living_room_temp_and_humidity_sensor:
+        value_template: '{{ states.sensor.living_room_temperature.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Living room temp. and humidity sensor'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.sensor.living_room_temperature.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_bedroom_eurotronic_eur_spiritz_thermostat:
+        value_template: '{{ states.zwave.bedroom_eurotronic_eur_spiritz_thermostat.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Bedroom wall radiator thermostat'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.zwave.bedroom_eurotronic_eur_spiritz_thermostat.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+      battery_living_room_eurotronic_eur_spiritz_thermostat:
+        value_template: '{{ states.zwave.living_room_eurotronic_eur_spiritz_thermostat.attributes.battery_level | default(0) | int }}'
+        friendly_name: 'Bedroom wall radiator thermostat'
+        unit_of_measurement: "%"
+        icon_template: >
+          {% set battery_level = states.zwave.living_room_eurotronic_eur_spiritz_thermostat.attributes.battery_level | default(0) | int %}
+          {% set battery_round = (battery_level / 10) | int * 10 %}
+          {% if battery_round >= 100 %}
+            mdi:battery
+          {% elif battery_round > 0 %}
+            mdi:battery-{{ battery_round }}
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+- alias: battery_notification
+  trigger:
+    - platform: time
+      minutes: '/15'
+      seconds: 00
+    - platform: state
+      entity_id:
+        - input_number.battery_alert_threshold_min
+        - input_number.battery_alert_threshold_max
+  condition:
+    - condition: template
+      value_template: "{{ not is_state('persistent_notification.low_battery_alert', 'notifying') }}"
+  action:
+    - condition: template
+      value_template: &low_battery_check >
+        {% macro battery_level() %}
+        {%- for item in states.sensor if (
+          (
+            not is_state_attr(item.entity_id, 'battery_alert_disabled', true)
+          ) and (
+            is_state_attr(item.entity_id, 'device_class', 'battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-alert')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-unknown')
+            ) or (
+              'battery' in item.entity_id | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              'battery' in item.name | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              (item.entity_id | lower).endswith('_bat')
+            ) or (
+              (item.name | lower).endswith('_bat')
+            )
+          ) and (
+            (
+              (
+                item.state is number
+                or item.state | length == item.state | int | string | length
+                or item.state | length == item.state | float | string | length
+              )
+              and item.state | int < states.input_number.battery_alert_threshold_max.state | int
+              and item.state | int > states.input_number.battery_alert_threshold_min.state | int
+            )
+            or item.state | lower == 'low'
+            or item.state | lower == 'unknown'
+          ) -%}
+          {{ item.name }} ({{ item.state }})
+        {% endfor -%}
+        {% endmacro %}
+        {{ battery_level() | trim != "" }}
+    - service: persistent_notification.create
+      data_template:
+        title: "Low Battery levels"
+        notification_id: low_battery_alert
+        message: &message >
+          {% macro battery_level() %}
+          {%- for item in states.sensor if (
+            (
+              not is_state_attr(item.entity_id, 'battery_alert_disabled', true)
+            ) and (
+              is_state_attr(item.entity_id, 'device_class', 'battery')
+              ) or (
+                is_state_attr(item.entity_id, 'icon', 'mdi:battery')
+              ) or (
+                is_state_attr(item.entity_id, 'icon', 'mdi:battery-alert')
+              ) or (
+                is_state_attr(item.entity_id, 'icon', 'mdi:battery-unknown')
+              ) or (
+                'battery' in item.entity_id | lower
+                and item.attributes.icon is defined
+                and 'battery' in item.attributes.icon | lower
+              ) or (
+                'battery' in item.name | lower
+                and item.attributes.icon is defined
+                and 'battery' in item.attributes.icon | lower
+              ) or (
+                (item.entity_id | lower).endswith('_bat')
+              ) or (
+                (item.name | lower).endswith('_bat')
+              )
+            ) and (
+              (
+                (
+                  item.state is number
+                  or item.state | length == item.state | int | string | length
+                  or item.state | length == item.state | float | string | length
+                )
+                and item.state | int < states.input_number.battery_alert_threshold_max.state | int
+                and item.state | int > states.input_number.battery_alert_threshold_min.state | int
+              )
+              or item.state | lower == 'low'
+              or item.state | lower == 'unknown'
+            ) -%}
+            {{ item.name }} ({{ item.state }})
+          {% endfor -%}
+          {% endmacro %}
+          {{ battery_level() }}
+
+- alias: battery_notification_clear
+  trigger:
+    - platform: time
+      minutes: '/15'
+      seconds: 00
+    - platform: state
+      entity_id:
+        - input_number.battery_alert_threshold_min
+        - input_number.battery_alert_threshold_max
+  action:
+    - condition: template
+      value_template: &low_battery_clear >
+        {% macro battery_level() %}
+        {%- for item in states.sensor if (
+          (
+            not is_state_attr(item.entity_id, 'battery_alert_disabled', true)
+          ) and (
+            is_state_attr(item.entity_id, 'device_class', 'battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-alert')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-unknown')
+            ) or (
+              'battery' in item.entity_id | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              'battery' in item.name | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              (item.entity_id | lower).endswith('_bat')
+            ) or (
+              (item.name | lower).endswith('_bat')
+            )
+          ) and (
+            (
+              (
+                item.state is number
+                or item.state | length == item.state | int | string | length
+                or item.state | length == item.state | float | string | length
+              )
+              and item.state | int < states.input_number.battery_alert_threshold_max.state | int
+              and item.state | int > states.input_number.battery_alert_threshold_min.state | int
+            )
+            or item.state | lower == 'low'
+            or item.state | lower == 'unknown'
+          ) -%}
+          {{ item.name }} ({{ item.state }})
+        {% endfor -%}
+        {% endmacro %}
+        {{ battery_level() | trim == "" }}
+    - service: persistent_notification.dismiss
+      data:
+        notification_id: low_battery_alert
+
+- alias: battery_notification_push
+  trigger:
+    - platform: time
+      at: '10:00:00'
+    - platform: time
+      at: '20:00:00'
+    - platform: state
+      entity_id:
+        - input_number.battery_alert_threshold_min
+        - input_number.battery_alert_threshold_max
+  action:
+    - condition: template
+      value_template: *low_battery_check
+    - service: notify.google_push_notification
+      data:
+        target:
+          - gombal_android
+        title: 'Low Battery Levels'
+        message: *message
+        data:
+          tag: 'replace_notification_low_battery_levels'
+          # 0 (do not notify when replace message)/1(notify again)
+          renotify: 1
+
+- alias: update_battery_status_group_members
+  trigger:
+    - platform: event
+      event_type: state_changed
+  condition:
+    - condition: template
+      value_template: "{{ trigger.event.data is not none }}"
+    - condition: template
+      value_template: "{{ trigger.event.data.new_state is not none }}"
+    - condition: template
+      value_template: "{{ trigger.event.data.new_state.attributes is not none }}"
+    - condition: template
+      value_template: "{{ trigger.event.data.old_state is not none }}"
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ is_state_attr(trigger.event.data.entity_id, 'device_class', 'battery') }}"
+        - condition: template
+          value_template: "{{ is_state_attr(trigger.event.data.entity_id, 'icon', 'mdi:battery') }}"
+        - condition: template
+          value_template: "{{ is_state_attr(trigger.event.data.entity_id, 'icon', 'mdi:battery-alert') }}"
+        - condition: template
+          value_template: "{{ is_state_attr(trigger.event.data.entity_id, 'icon', 'mdi:battery-unknown') }}"
+        - condition: and
+          conditions:
+          - condition: template
+            value_template: "{{ trigger.event.data.new_state.attributes.icon is defined }}"
+          - condition: template
+            value_template: "{{ 'battery' in trigger.event.data.new_state.attributes.icon | lower }}"
+          - condition: or
+            conditions:
+            - condition: template
+              value_template: "{{ 'battery' in trigger.event.data.entity_id | lower }}"
+            - condition: template
+              value_template: "{{ 'battery' in trigger.event.data.new_state.name | lower }}"
+        - condition: template
+          value_template: "{{ (trigger.event.data.entity_id | lower).endswith('_bat') }}"
+        - condition: template
+          value_template: "{{ (trigger.event.data.new_state.name | lower).endswith('_bat') }}"
+  action:
+    - service: group.set
+      data_template:
+        object_id: "battery_status"
+        entities: >-
+          {%- for item in states.sensor if (
+            is_state_attr(item.entity_id, 'device_class', 'battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-alert')
+            ) or (
+              is_state_attr(item.entity_id, 'icon', 'mdi:battery-unknown')
+            ) or (
+              'battery' in item.entity_id | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              'battery' in item.name | lower
+              and item.attributes.icon is defined
+              and 'battery' in item.attributes.icon | lower
+            ) or (
+              (item.entity_id | lower).endswith('_bat')
+            ) or (
+              (item.name | lower).endswith('_bat')
+            )
+          -%}
+            {{ item.entity_id }}{% if not loop.last %}, {% endif %}
+          {%- endfor -%}

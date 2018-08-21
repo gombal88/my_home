@@ -1,0 +1,359 @@
+################################################################################
+## Xiomi vacuum
+## https://medium.com/@honcheng/how-i-got-my-vacuum-cleaner-to-talk-back-to-me-via-telegram-d4b471b7598c
+################################################################################
+
+vacuum:
+  - platform: xiaomi_miio
+    name: Xiaomi Vacuum
+    host: !secret xiaomi_vacuum_ip
+    token: !secret xiaomi_vacuum_token
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+
+    ## GROUP
+
+    group.cleaning:
+      control: hidden
+
+    ## SENSOR
+    sensor.vacuum_cleaner_error:
+      hidden: true
+
+    sensor.vacuum_cleaner_status:
+      hidden: true
+
+    ## SCRIPT
+    script.vacuum_livingroom:
+      hidden: true
+
+    script.vacuum_kitchen:
+      hidden: true
+
+    script.vacuum_hall:
+      hidden: true
+
+    script.vacuum_bathroom:
+      hidden: true
+
+    script.vacuum_bedroom:
+      hidden: true
+
+    script.vacuum_office:
+      hidden: true
+
+    script.vacuum_room:
+      hidden: true
+
+    script.vacuum_room_select:
+      hidden: true
+
+    ## AUTOMATION
+    automation.vacuum_startstop_notification:
+      icon: mdi:bell-ring
+
+    automation.vacuum_error_notification:
+      icon: mdi:bell-ring
+
+    automation.daily_clean_up:
+      icon: mdi:broom
+
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  cleaning:
+      name: House cleaning
+      entities:
+        - vacuum.xiaomi_vacuum
+        - input_select.vacuum_room_select
+#        - script.vacuum_room
+        - input_datetime.vacuum_time
+        - automation.daily_clean_up
+        - automation.vacuum_startstop_notification
+        - automation.vacuum_error_notification
+
+
+################################################################################
+## Sensors
+################################################################################
+
+sensor:
+  - platform: template
+    sensors:
+      vacuum_cleaner_error:
+        friendly_name: Vacuum Cleaner Error Sensor
+        value_template: >-
+          {% if states.vacuum.xiaomi_vacuum.attributes.error is defined %}
+            {{states.vacuum.xiaomi_vacuum.attributes.error}}
+          {% else %}
+            No Error
+          {% endif %}
+
+      vacuum_cleaner_status:
+        friendly_name: Vacuum Cleaner Status Sensor
+        value_template: >-
+          {{ states.vacuum.xiaomi_vacuum.attributes.status }}
+
+
+################################################################################
+## Input select
+################################################################################
+input_select:
+  vacuum_room_select:
+    name: Choose a room to clean
+    options:
+      - Select room
+      - Living room
+      - Kitchen
+      - Hall
+      - Bathroom
+      - Bedroom
+      - Office
+    initial: Select room
+
+input_datetime:
+  vacuum_time:
+    name: Time of daily clean up
+    has_date: false
+    has_time: true
+
+
+################################################################################
+## Script
+################################################################################
+script:
+  vacuum_livingroom:
+    alias: "Vacuum Living room"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[24750, 22000, 29000, 26100, 1]] # living room
+
+  vacuum_kitchen:
+    alias: "Vacuum Kitchen"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[28500, 22000, 31000, 25500, 1]]
+
+  vacuum_hall:
+    alias: "Vacuum Hall"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[29900, 20500, 34000, 23300, 1]]
+
+  vacuum_bathroom:
+    alias: "Vacuum Bathroom"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[32000, 23300, 33900, 24800, 1]]
+
+  vacuum_bedroom:
+    alias: "Vacuum Bedroom"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[34100, 22200, 37900, 25500, 1]]
+
+  vacuum_office:
+    alias: "Vacuum Office"
+    sequence:
+      - service: vacuum.send_command
+        data:
+          entity_id: vacuum.xiaomi_vacuum
+          command: app_zoned_clean
+          params: [[0, 0, 0, 0, 0]]
+
+  # vacuum_clean_zone:
+  #   alias: "Vacuum selected zone"
+  #   sequence:
+  #     - service: vacuum.send_command
+  #       data:
+  #         entity_id: vacuum.xiaomi_vacuum
+  #         command: app_zoned_clean
+  #         params: #>-
+            # {% if is_state('input_select.vacuum_room_select', 'Living room')  %}
+            #   [[24750, 22000, 29000, 26100, 1]]
+            # {% elseif is_state('input_select.vacuum_room_select', 'Kitchen') %}
+            #   [[0, 0, 0, 0, 1]]
+            # {% elseif is_state('input_select.vacuum_room_select', 'Hall') %}
+            #   [[0, 0, 0, 0, 1]]
+            # {% elseif is_state('input_select.vacuum_room_select', 'Bathroom') %}
+            #   [[0, 0, 0, 0, 1]]
+            # {% elseif is_state('input_select.vacuum_room_select', 'Bedroom') %}
+            #   [[0, 0, 0, 0, 1]]
+            # {% elseif is_state('input_select.vacuum_room_select', 'Office') %}
+            #   [[0, 0, 0, 0, 1]]
+            # {% endif %}
+
+
+  vacuum_room:
+    alias: "Start cleaning"
+    sequence:
+      - service: script.turn_on
+        data_template:
+          entity_id: >
+            {% if is_state('input_select.vacuum_room_select', 'Living room')  %}
+              script.vacuum_livingroom
+            {% elif is_state('input_select.vacuum_room_select', 'Kitchen') %}
+              script.vacuum_kitchen
+            {% elif is_state('input_select.vacuum_room_select', 'Hall') %}
+              script.vacuum_hall
+            {% elif is_state('input_select.vacuum_room_select', 'Bathroom') %}
+              script.vacuum_bathroom
+            {% elif is_state('input_select.vacuum_room_select', 'Bedroom') %}
+              script.vacuum_bedroom
+            {% elif is_state('input_select.vacuum_room_select', 'Office') %}
+              script.vacuum_office
+            {% endif %}
+
+  # vacuum_room:
+  #   alias: "Start cleaning"
+  #   sequence:
+  #     - service: script.turn_on
+  #       entity_id: script.vacuum_zoned_clean
+
+
+  vacuum_room_select:
+    sequence:
+      - service: script.turn_on
+        data_template:
+          entity_id: >
+            {% if (room == "kitchen" or "the kitchen") %}
+              script.vacuum_kitchen
+            {% elif (room == "living room" or "room" or "the living room") %}
+              script.vacuum_livingroom
+            {% elif (room == "hall" or "the hall") %}
+              script.vacuum_hall
+            {% elif (room == "bathroom" or "the bathroom") %}
+              script.vacuum_bathroom
+            {% elif (room == "bedroom" or "the bedroom") %}
+              script.vacuum_bedroom
+            {% elif (room == "office" or "the office") %}
+              script.vacuum_office
+            {% endif %}
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+
+#  - alias: Weakday Vacuum
+#    trigger:
+#      - platform: time
+#        at: '13:00:00'
+#        weekday:
+#          - mon
+#          - tue
+#          - wed
+#          - thy
+#          - fri
+
+  - alias: Daily clean up
+    trigger:
+      platform: template
+      value_template: "{{ states('sensor.time') == (states.input_datetime.vacuum_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+    action:
+    - service: vacuum.turn_on
+      entity_id: vacuum.xiaomi_vaccum
+
+
+  - alias: Start Cleaning Room From Selection
+    hide_entity: True
+    trigger:
+    - platform: state
+      entity_id: input_select.vacuum_room_select
+      from: 'Select room'
+    action:
+    - service: script.turn_on
+      data_template:
+        entity_id: >
+          {% if is_state('input_select.vacuum_room_select', 'Living room')  %}
+            script.vacuum_livingroom
+          {% elif is_state('input_select.vacuum_room_select', 'Kitchen') %}
+            script.vacuum_kitchen
+          {% elif is_state('input_select.vacuum_room_select', 'Hall') %}
+            script.vacuum_hall
+          {% elif is_state('input_select.vacuum_room_select', 'Bathroom') %}
+            script.vacuum_bathroom
+          {% elif is_state('input_select.vacuum_room_select', 'Bedroom') %}
+            script.vacuum_bedroom
+          {% elif is_state('input_select.vacuum_room_select', 'Office') %}
+            script.vacuum_office
+          {% endif %}
+    - service: input_select.select_option
+      entity_id: input_select.vacuum_room_select
+      data_template:
+        option: "Select room"
+
+
+  - alias: Vacuum Start/Stop Notification
+    trigger:
+      - platform: state
+        entity_id: vacuum.xiaomi_vacuum
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+    action:
+    - service: notify.google_push_notification
+      data:
+        target:
+          - gombal_android
+          - kasia_android
+        title: 'Vacuum'
+        message: '{{states.sensor.vacuum_cleaner_status.state}}'
+        # data:
+        #   tag: 'replace_notification_vacuum_start_stop'
+        #   # 0 (do not notify when replace message)/1(notify again)
+        #   renotify: 1
+
+
+  - alias: Vacuum Error Notification
+    trigger:
+      - platform: state
+        entity_id: sensor.vacuum_cleaner_status
+        to: 'Error'
+      - platform: state
+        entity_id: sensor.vacuum_cleaner_status
+        to: 'In Error'
+      - platform: state
+        entity_id: sensor.vacuum_cleaner_status
+        to: 'Charging Error'
+    action:
+    - service: notify.google_push_notification
+      data:
+        target:
+          - gombal_android
+          - kasia_android
+        title: 'Vacuum error'
+        message: >-
+          {% if is_state('sensor.vacuum_cleaner_error', 'No Error')  %}
+            {{states.sensor.vacuum_cleaner_status.state}}
+          {% else %}
+            {{states.sensor.vacuum_cleaner_error.state}}
+          {% endif %}
+        data:
+          tag: 'replace_notification_vacuum_error'
+          # 0 (do not notify when replace message)/1(notify again)
+          renotify: 1

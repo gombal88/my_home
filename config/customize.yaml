@@ -1,0 +1,106 @@
+################################################################################
+#   Hidden entities
+################################################################################
+sensor.kitchen_light_heat:
+  hidden: true
+
+################################################################################
+#   Lights
+################################################################################
+
+switch.kitchen_light_table:
+  friendly_name: Table lights
+  icon: mdi:lightbulb
+
+switch.kitchen_light_main:
+  friendly_name: Kitchen main lights
+  icon: mdi:lightbulb
+
+switch.living_room_light_switch_2:
+  friendly_name: Living room lamp
+  icon: mdi:lightbulb
+
+switch.living_room_light_switch_3:
+  friendly_name: Living room wall LED
+  icon: mdi:lightbulb
+
+light.gateway_xiaomi:
+  friendly_name: Xiaomi Gateway Light
+  icon: mdi:lightbulb
+
+switch.bedroom_desk_lamp:
+  friendly_name: Desk Lamp
+  icon: mdi:lamp
+  # icon: mdi:desk-lamp
+
+
+################################################################################
+#   Sensors
+################################################################################
+
+# Door/Window Sensor
+binary_sensor.door_window_sensor:
+  friendly_name: Front Door
+  device_class: door
+
+binary_sensor.living_room_window_sensor:
+  friendly_name: Living Room window
+  device_class: window
+
+binary_sensor.bedroom_window_sensor:
+  friendly_name: Bedroom window
+  device_class: window
+
+binary_sensor.office_window_sensor:
+  friendly_name: Office window
+  device_class: window
+
+# Flood sensor
+binary_sensor.kitchen_water_leak_sensor:
+  friendly_name: Water leak sensor
+  device_class: moisture
+
+binary_sensor.bathroom_water_leak_sensor:
+  friendly_name: Water leak sensor
+  device_class: moisture
+
+# Motion Sensor
+binary_sensor.hall_motion_sensor:
+  friendly_name: Motion Sensor
+
+# Humidity Sensor
+sensor.living_room_humidity:
+  friendly_name: Humidity
+
+# Temperature Sensor
+sensor.living_room_temperature:
+  friendly_name: Temperature
+
+sensor.living_room_thermostat_temperature:
+  friendly_name: Thermostat temp.
+
+sensor.bedroom_thermostat_temperature:
+  friendly_name: Thermostat temp.
+
+sensor.bathroom_heatit_thermostat_temperature:
+  friendly_name: Temperature
+
+
+################################################################################
+#   Groups
+################################################################################
+
+group.living_room:
+  order: 1
+
+group.bedroom:
+  order: 2
+
+group.office:
+  order: 3
+
+group.kitchen:
+  order: 4
+
+group.bathroom:
+  order: 5

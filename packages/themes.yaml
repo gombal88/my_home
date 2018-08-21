@@ -1,0 +1,124 @@
+################################################################################
+## Themes
+################################################################################
+
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+
+
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  themes:
+    control: hidden
+    name: Themes
+    entities:
+      - input_boolean.use_dark_theme
+      - input_select.theme_select
+      - automation.automatic_theme_change
+
+
+################################################################################
+## Input
+################################################################################
+input_boolean:
+  use_dark_theme:
+    name: Use dark theme
+    icon: mdi:theme-light-dark
+    initial: off
+
+input_select:
+  theme_select:
+    name: Choose theme
+    options:
+      - Default
+      - Dark blue
+      - Dark red
+      - Dark mono
+    initial: Default
+
+
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+
+  - alias: Apply selected theme
+    hide_entity: True
+    trigger:
+    - platform: state
+      entity_id: input_select.theme_select
+    action:
+    - service: frontend.set_theme
+      data_template:
+        name: >-
+          {% if is_state('input_select.theme_select', 'Default')  %}
+            default
+          {% elif is_state('input_select.theme_select', 'Dark blue') %}
+            dark_blue
+          {% elif is_state('input_select.theme_select', 'Dark red') %}
+            dark_red
+          {% elif is_state('input_select.theme_select', 'Dark mono') %}
+            dark_mono
+          {% endif %}
+
+
+  - alias: Use dark theme
+    hide_entity: True
+    trigger:
+    - platform: state
+      entity_id: input_boolean.use_dark_theme
+    action:
+    - service: frontend.set_theme
+      data_template:
+        name: >-
+          {% if states.input_boolean.use_dark_theme.state == "on" %}
+            dark_blue
+          {% else %}
+          	default
+          {% endif %}
+    - service: input_select.select_option
+      entity_id: input_select.theme_select
+      data_template:
+        option: >-
+          {% if states.input_boolean.use_dark_theme.state == "on" %}
+            'Dark blue'
+          {% else %}
+            'Default'
+          {% endif %}
+
+
+  - alias: Automatic Theme Change
+    trigger:
+    - platform: state
+      entity_id: input_boolean.use_dark_theme
+    - platform: homeassistant
+      event: start
+    - platform: time
+      at: '23:00:00'
+    - platform: time
+      at: '07:00:00'
+    condition:
+      condition: state
+      entity_id: input_boolean.use_dark_theme
+      state: 'off'
+    action:
+      service: frontend.set_theme
+      data_template:
+        name: >-
+          {% if ((now().hour == 23) or (now().hour < 7)) %}
+           dark_blue
+          {% else %}
+           default
+          {% endif %}
+

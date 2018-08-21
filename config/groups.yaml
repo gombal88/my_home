@@ -1,0 +1,158 @@
+################################################################################
+#    Home View
+################################################################################
+
+# default_view:
+#   view: yes
+#   icon: mdi:home
+#   entities:
+#     - group.living_room
+
+
+
+home_view:
+  view: yes
+  icon: mdi:home
+  entities:
+    - sun.sun
+    - device_tracker.google_maps_108345975451347576395
+    - device_tracker.google_maps_113699315460241381781
+    - group.home_status
+    - group.living_room
+    - group.bedroom
+    - group.office
+    - group.kitchen
+    - group.bathroom
+
+
+home_status:
+  name: Home Status
+  icon: mdi:home
+  entities:
+    - binary_sensor.door_window_sensor
+
+
+################################################################################
+#    Living Room
+################################################################################
+
+living_room:
+  name: 'Living Room'
+  # view: yes
+  control: hidden
+  icon: mdi:sofa
+  entities:
+    - sensor.living_room_temperature
+    - sensor.living_room_thermostat_temperature
+    - sensor.living_room_humidity
+    - binary_sensor.living_room_window_sensor
+    - light.gateway_xiaomi
+    - vacuum.xiaomi_vacuum
+    - media_player.tv
+    - media_player.googlehome
+
+
+################################################################################
+#    Bedroom
+################################################################################
+
+bedroom:
+  name: 'Bedroom'
+  # view: yes
+  control: hidden
+  icon: mdi:bed-empty
+  entities:
+    # - group.bedroom_Lights
+    - sensor.bedroom_thermostat_temperature
+    - binary_sensor.bedroom_window_sensor
+    - switch.bedroom_desk_lamp
+
+# bedroom_Lights:
+#   name: 'Light'
+#   entities:
+#     - switch.bedroom_desk_lamp
+
+
+################################################################################
+#    Office
+################################################################################
+
+office:
+  name: 'Office'
+  # view: yes
+  control: hidden
+  icon: mdi:bed-empty
+  entities:
+    - binary_sensor.office_window_sensor
+
+
+################################################################################
+#    Kitchen
+################################################################################
+
+kitchen:
+  name: 'Kitchen'
+  # view: yes
+  control: hidden
+  # icon: mdi:kettle
+  icon: mdi:silverware-variant
+  entities:
+    - binary_sensor.hall_motion_sensor
+    - binary_sensor.kitchen_water_leak_sensor
+    - switch.kitchen_light_main
+    - switch.kitchen_light_table
+    - media_player.googlehome
+
+# kitchen_lights:
+#   name: 'Light'
+#   entities:
+#     - switch.kitchen_light_main
+#     - switch.kitchen_light_table
+
+
+################################################################################
+#    Bathroom
+################################################################################
+
+bathroom:
+  name: 'Bathroom'
+  # view: yes
+  control: hidden
+  icon: mdi:shower
+  entities:
+    - sensor.bathroom_heatit_thermostat_temperature
+    - binary_sensor.bathroom_water_leak_sensor
+    - media_player.bathroom
+
+
+################################################################################
+#    Multimedia
+################################################################################
+
+multimedia:
+  name: 'Entertainment'
+  view: yes
+  icon: mdi:play-pause
+  entities:
+    - media_player.all_speakers
+    - media_player.tv
+    - media_player.googlehome
+    - media_player.bathroom
+
+
+################################################################################
+#    Settings & Management
+################################################################################
+
+settings:
+  name: Settings & Management
+  view: yes
+  icon: mdi:settings
+  entities:
+    - group.system_status
+    - group.home_assistant_status
+    - group.themes
+    - group.battery_alert
+    - group.battery_status
+    - group.ssl_certificate
+    - group.z_wave_devices

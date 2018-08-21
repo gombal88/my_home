@@ -1,0 +1,164 @@
+################################################################################
+#  HOME ASSISTANT
+#  https://home-assistant.io/docs/configuration/basic/
+#  https://www.home-assistant.io/docs/installation/hassbian/common-tasks/
+################################################################################
+
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude_home
+  longitude: !secret longitude_home
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: !secret elevation_home
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Warsaw
+  # List of folders that can be used as sources for sending files
+  whitelist_external_dirs:
+    - /home/homeassistant/.homeassistant/
+  # Customization file
+  customize: !include config/customize.yaml
+  # Customize entities matching a pattern
+  customize_glob: !include config/customize_glob.yaml
+  # Packages
+  # https://www.home-assistant.io/docs/configuration/packages/
+  packages: !include_dir_named packages/
+
+  auth_providers:
+  - type: homeassistant
+  # Uncomment next line if you want to enable legacy API password support
+  - type: legacy_api_password
+
+
+################################################################################
+#  General
+################################################################################
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend
+# https://www.home-assistant.io/components/frontend/
+frontend:
+  themes: !include_dir_merge_named themes/
+
+# Customizer for loading CustomUI and dynamic customization
+# https://github.com/andrey-git/home-assistant-customizer
+customizer:
+  custom_ui: local
+  # columns: [300, 600, 900, 1200, 1500, 1800]
+  columns: [350, 700, 1050, 1400, 1850, 2100]
+
+# Enables configuration UI
+# https://home-assistant.io/components/config/
+config:
+
+# Enable the auth component
+auth:
+
+# https://home-assistant.io/components/http/
+http:
+  api_password: !secret http_password
+  ssl_certificate: !secret http_ssl_cert
+  ssl_key: !secret http_ssl_key
+  base_url: !secret http_base_url
+  trusted_networks:
+  - 192.168.1.1
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time
+# https://home-assistant.io/components/history/
+history:
+
+# View all events in a logbook
+logbook:
+
+# Enables a map showing the location of tracked devices
+map:
+
+# Track the sun
+# https://home-assistant.io/components/sun/
+sun:
+
+# Weather
+# https://www.home-assistant.io/components/weather/
+# https://www.home-assistant.io/components/weather.darksky/
+weather:
+  - platform: darksky
+    api_key: !secret dark_sky_api_key
+
+# Text to speech
+tts:
+  - platform: google
+
+# Additional panels to your Home Assistant frontend
+panel_iframe:
+  configurator:
+    title: Configurator
+    icon: mdi:wrench
+    url: https://home.pin-app.pl:3218
+
+# Z-Wave
+# https://home-assistant.io/docs/z-wave/
+zwave:
+  usb_path: /dev/ttyACM0
+
+# Climate
+climate:
+  - platform: zwave
+
+# Xiaomi Smart Home Gateway - Zigbee
+xiaomi_aqara:
+  discovery_retry: 5
+  gateways:
+    - key: !secret xiaomi_gateway_key
+
+
+################################################################################
+#  Links to individual configuration files
+#  https://home-assistant.io/docs/configuration/splitting_configuration/
+################################################################################
+
+# Cloud
+cloud: !include config/google_actions.yaml
+
+# Notification
+notify: !include config/notification.yaml
+
+# Groups
+group: !include config/groups.yaml
+
+# Device location tracker
+# https://home-assistant.io/components/device_tracker/
+device_tracker: !include config/device_tracker.yaml
+
+# Sensors
+# https://home-assistant.io/components/sensor/
+sensor: !include config/sensors.yaml
+
+# Shell commands
+# https://www.home-assistant.io/components/shell_command/
+shell_command: !include config/shell_commands.yaml
+
+# Automations
+automation: !include_dir_merge_list automation/
+
+# Scripts
+script: !include config/scripts.yaml

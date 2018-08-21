@@ -1,0 +1,9 @@
+################################################################################
+# Device location tracker
+# https://home-assistant.io/components/device_tracker/
+################################################################################
+
+# https://www.home-assistant.io/components/device_tracker.google_maps/
+  - platform: google_maps
+    username: !secret google_location_sharing_username
+    password: !secret google_location_sharing_password

@@ -1,0 +1,8 @@
+################################################################################
+#   Customize entities matching a pattern
+################################################################################
+
+# CustomUI
+# https://github.com/andrey-git/home-assistant-custom-ui/blob/master/docs/activating.md
+"*.*":
+  custom_ui_state_card: state-card-custom-ui

@@ -1,0 +1,176 @@
+################################################################################
+## All Home Assistant statuses and autamations
+##
+################################################################################
+
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+
+    ################################################
+    ## Sensors
+    ################################################
+
+    sensor.cpu_temp:
+      icon: mdi:temperature-celsius
+
+    sensor.cpu:
+      icon: mdi:chip
+
+    sensor.disk_use_percent_home:
+      icon: mdi:harddisk
+
+    sensor.installed_ha_version:
+      icon: mdi:home-assistant
+
+    sensor.homeassistant_v2db:
+      friendly_name: HA DB size
+      icon: mdi:database
+
+    sensor.ha_last_reboot:
+      icon: mdi:restart
+
+    sensor.ha_uptime:
+      icon: mdi:av-timer
+
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  system_status:
+    name: System Status
+    icon: mdi:information
+    entities:
+      - sensor.processor_use
+      - sensor.cpu_temp
+      - sensor.memory_use_percent
+      - sensor.disk_use_percent_home
+      # - sensor.installed_ha_version
+      # - sensor.homeassistant_v2db
+      # - sensor.ha_uptime
+      # - sensor.ha_last_reboot
+      # - sensor.ssl_cert_expiry
+
+  home_assistant_status:
+    name: Home Assistant Status
+    icon: mdi:information
+    entities:
+      - sensor.installed_ha_version
+      - sensor.homeassistant_v2db
+      - sensor.ha_uptime
+      - sensor.ha_last_reboot
+      - automation.home_assistant_update_notification
+
+  z_wave_devices:
+    name: Z-wave info
+    entities:
+      - zwave.aeotec_zw090_zstick_gen5_eu
+      - zwave.bedroom_eurotronic_eur_spiritz_thermostat
+      - zwave.living_room_eurotronic_eur_spiritz_thermostat
+      - zwave.thermofloor_as_heatit_thermostat_tf_021
+      - zwave.kitchen_light_fibaro_system_fgs223_double_relay
+      - zwave.philio_technology_corporation_unknown_type0001_id0013
+
+
+################################################################################
+## Sensors
+################################################################################
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: memory_use_percent
+      - type: processor_use
+      - type: disk_use_percent
+        arg: /home
+
+  - platform: command_line
+    command: /srv/homeassistant/bin/hass --version
+    name: Installed HA Version
+    scan_interval: 3600
+
+  - platform: filesize
+    file_paths:
+      - /home/homeassistant/.homeassistant/home-assistant_v2.db
+
+  - platform: command_line
+    name: CPU Temp
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    unit_of_measurement: "C"
+    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  - platform: command_line
+    name: "HA Last Reboot"
+    command: cat /proc/uptime | awk '{printf "%0.f", $1}'
+    scan_interval: 60
+    value_template: >-
+      {% set uptime = value | int %}
+      {% set seconds = uptime % 60 %}
+      {% set minutes = ((uptime % 3600) / 60) | int %}
+      {% set hours = ((uptime % 86400) / 3600) | int %}
+      {% set days = (uptime / 86400) | int %}
+      {%- if days > 0 -%}
+        {%- if days == 1 -%}
+          1 day
+        {%- else -%}
+          {{ days }} days
+        {%- endif -%}
+        {{ ', ' }}
+      {%- endif -%}
+      {{ '%02d' % hours }}:{{ '%02d' % minutes }}
+
+  - platform: command_line
+    name: "HA Uptime"
+    command: echo "$(($(date +%s) - $(date -d "$(head -n1 /home/homeassistant/.homeassistant/home-assistant.log | cut -d' ' -f-2)" +%s)))"
+    scan_interval: 60
+    value_template: >-
+      {% set uptime = value | int %}
+      {% set seconds = uptime % 60 %}
+      {% set minutes = ((uptime % 3600) / 60) | int %}
+      {% set hours = ((uptime % 86400) / 3600) | int %}
+      {% set days = (uptime / 86400) | int %}
+      {%- if days > 0 -%}
+        {%- if days == 1 -%}
+          1 day
+        {%- else -%}
+          {{ days }} days
+        {%- endif -%}
+        {{ ', ' }}
+      {%- endif -%}
+      {{ '%02d' % hours }}:{{ '%02d' % minutes }}
+
+# Sensor for SSL certificate expire
+# https://www.home-assistant.io/docs/ecosystem/certificates/lets_encrypt/#7---set-up-a-sensor-to-monitor-the-expiry-date-of-the-certificate
+  - platform: command_line
+    name: SSL cert expiry
+    unit_of_measurement: days
+    scan_interval: 21600
+    command: "ssl-cert-check -b -c /etc/letsencrypt/live/home.pin-app.pl/cert.pem | awk '{ print $NF }'"
+
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+- alias: 'Home Assistant update notification'
+  trigger:
+    platform: state
+    entity_id: updater.updater
+  action:
+    service: notify.google_push_notification
+    data:
+      target:
+        - gombal_android
+        - gombal_mac
+      title: 'New Home Assistant Release'
+      message: 'Home Assistant {{ states.updater.updater.state }} is now available.'
+      data:
+        url: 'https://home-assistant.io/blog/'
+        # url: '{{ states.updater.updater.attributes.release_notes }}'

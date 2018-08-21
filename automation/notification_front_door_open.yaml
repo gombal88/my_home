@@ -1,0 +1,16 @@
+  - alias: 'Front door open notification'
+    trigger:
+      platform: state
+      entity_id: binary_sensor.door_window_sensor
+      to: 'on'
+    action:
+      service: notify.google_push_notification
+      data:
+        target:
+          - gombal_android
+        title: 'Front door'
+        message: 'The front door was opened at {{now().strftime("%H:%M on %A")}}'
+        data:
+          tag: 'replace_notification_open_door'
+          # 0 (do not notify when replace message)/1(notify again)
+          renotify: 1

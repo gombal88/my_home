@@ -1,0 +1,85 @@
+################################################################################
+## SSL certificate management
+##
+################################################################################
+
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+    sensor.ssl_cert_expiry:
+      friendly_name: SSl will expire in
+      icon: mdi:certificate
+
+    group.ssl_certificate:
+      icon: mdi:certificate
+      control: hidden
+
+    automation.ssl_expiry_notification:
+      icon: mdi:comment-alert-outline
+
+    automation.auto_renew_ssl_cert:
+      icon: mdi:autorenew
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  ssl_certificate:
+      name: Home Assistant SSL certificate
+      entities:
+        - sensor.ssl_cert_expiry
+        - automation.ssl_expiry_notification
+        - automation.auto_renew_ssl_cert
+
+
+################################################################################
+## Sensors
+################################################################################
+
+sensor:
+# Sensor for SSL certificate expire
+# https://www.home-assistant.io/docs/ecosystem/certificates/lets_encrypt/#7---set-up-a-sensor-to-monitor-the-expiry-date-of-the-certificate
+  - platform: command_line
+    name: SSL cert expiry
+    unit_of_measurement: days
+    scan_interval: 21600
+    command: "ssl-cert-check -b -c /etc/letsencrypt/live/home.pin-app.pl/cert.pem | awk '{ print $NF }'"
+
+
+################################################################################
+## Sensors
+################################################################################
+
+shell_command:
+  # Renew ssl Option 2
+  # https://www.home-assistant.io/docs/ecosystem/certificates/lets_encrypt/#8---set-up-an-automatic-renewal-of-the-tlsssl-certificate
+  renew_ssl: ~/certbot/certbot-auto renew --quiet --no-self-upgrade --standalone --preferred-challenges http-01
+
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+- alias: 'Auto Renew SSL Cert'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.ssl_cert_expiry
+    below: 29
+  action:
+    service: shell_command.renew_ssl
+
+- alias: 'SSL expiry notification'
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.ssl_cert_expiry
+    below: 21
+  action:
+    service: notify.google_push_notification_gombal_android
+    data:
+      message: 'Warning - SSL certificate expires in 21 days and has not been automatically renewed'
