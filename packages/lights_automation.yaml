@@ -1,0 +1,107 @@
+################################################################################
+## Lights automation
+################################################################################
+
+
+################################################################################
+## Customize
+################################################################################
+
+homeassistant:
+  customize:
+
+
+
+################################################################################
+## Group
+################################################################################
+
+group:
+  lights_automation:
+    control: hidden
+    name: Lights automations
+    entities:
+      - automation.kitchen_light_on_when_detect_motion
+      - automation.kitchen_light_off_when_no_motion
+      - automation.hallway_light_on_when_detect_motion
+      - automation.hallway_light_off_when_no_motion
+
+
+
+################################################################################
+## Automation
+################################################################################
+
+automation:
+
+# Kitchen lights
+
+  - alias: kitchen_light_on_when_detect_motion
+#    hide_entity: True
+    trigger:
+      platform: state
+      entity_id: binary_sensor.kitchen_motion_sensor
+      from: 'off'
+      to: 'on'
+    condition:
+      condition: and
+      conditions:
+        - condition: time
+          before: '01:00:00'
+        - condition: or
+          conditions:
+            - condition: numeric_state
+              entity_id: sensor.kitchen_illumination
+              below: 300
+            - condition: sun
+              after: sunset
+              # Optional offset value - in this case it must from -1 hours relative to sunset, or after
+              after_offset: "-01:00:00"
+    action:
+    - service: switch.turn_on
+      entity_id: switch.kitchen_light_main
+
+  - alias: kitchen_light_off_when_no_motion
+    trigger:
+      platform: state
+      entity_id: binary_sensor.kitchen_motion_sensor
+      from: 'on'
+      to: 'off'
+      for:
+        minutes: 5
+    action:
+    - service: switch.turn_off
+      entity_id: switch.kitchen_light_main
+    - service: switch.turn_off
+      entity_id: switch.kitchen_light_table
+
+
+# Entry and halway
+  - alias: hallway_light_on_when_detect_motion
+    #    hide_entity: True
+    trigger:
+      platform: state
+      entity_id: binary_sensor.hallway_motion_sensor
+      from: 'off'
+      to: 'on'
+    condition:
+      - condition: time
+        after: '23:00:00'
+        before: '06:00:00'
+    action:
+    - service: light.turn_on
+      entity_id: light.gateway_xiaomi
+      data:
+        brightness: 255
+
+  - alias: hallway_light_off_when_no_motion
+    trigger:
+      platform: state
+      entity_id: binary_sensor.hallway_motion_sensor
+      from: 'on'
+      to: 'off'
+      for:
+        minutes: 5
+    action:
+    - service: light.turn_off
+      entity_id: light.gateway_xiaomi

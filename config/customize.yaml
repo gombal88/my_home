@@ -65,8 +65,21 @@ binary_sensor.bathroom_water_leak_sensor:
   device_class: moisture
 
 # Motion Sensor
-binary_sensor.hall_motion_sensor:
+binary_sensor.hallway_motion_sensor:
   friendly_name: Motion Sensor
+
+binary_sensor.kitchen_motion_sensor:
+  friendly_name: Motion Sensor
+
+binary_sensor.motion_sensor_free:
+  friendly_name: Motion Sensor
+
+# Illumination
+sensor.kitchen_illumination:
+  friendly_name: Illumination
+
+sensor.hallway_illumination:
+  friendly_name: Illumination
 
 # Humidity Sensor
 sensor.living_room_humidity:

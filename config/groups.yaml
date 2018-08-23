@@ -17,19 +17,24 @@ home_view:
     - sun.sun
     - device_tracker.google_maps_108345975451347576395
     - device_tracker.google_maps_113699315460241381781
-    - group.home_status
+    - group.entry_and_hallway
     - group.living_room
     - group.bedroom
     - group.office
     - group.kitchen
     - group.bathroom
 
+################################################################################
+#    Entry and hallway
+################################################################################
 
-home_status:
-  name: Home Status
+entry_and_hallway:
+  name: Entry and hallway
   icon: mdi:home
   entities:
     - binary_sensor.door_window_sensor
+    - binary_sensor.hallway_motion_sensor
+    - sensor.hallway_illumination
 
 
 ################################################################################
@@ -97,7 +102,8 @@ kitchen:
   # icon: mdi:kettle
   icon: mdi:silverware-variant
   entities:
-    - binary_sensor.hall_motion_sensor
+    - binary_sensor.kitchen_motion_sensor
+    - sensor.kitchen_illumination
     - binary_sensor.kitchen_water_leak_sensor
     - switch.kitchen_light_main
     - switch.kitchen_light_table

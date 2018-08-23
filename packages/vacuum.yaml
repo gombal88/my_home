@@ -74,9 +74,8 @@ group:
       entities:
         - vacuum.xiaomi_vacuum
         - input_select.vacuum_room_select
-#        - script.vacuum_room
         - input_datetime.vacuum_time
-        - automation.daily_clean_up
+        - automation.weekday_clean_up
         - automation.vacuum_startstop_notification
         - automation.vacuum_error_notification
 
@@ -259,24 +258,21 @@ script:
 
 automation:
 
-#  - alias: Weakday Vacuum
-#    trigger:
-#      - platform: time
-#        at: '13:00:00'
-#        weekday:
-#          - mon
-#          - tue
-#          - wed
-#          - thy
-#          - fri
-
-  - alias: Daily clean up
+  - alias: Weekday clean up
     trigger:
       platform: template
-      value_template: "{{ states('sensor.time') == (states.input_datetime.vacuum_time.attributes.timestamp | int | timestamp_custom('%H:%M', False)) }}"
+      value_template: '{{ states.sensor.time.state == states.input_datetime.vacuum_time.state[0:5] }}'
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
     action:
     - service: vacuum.turn_on
-      entity_id: vacuum.xiaomi_vaccum
+      entity_id: vacuum.xiaomi_vacuum
 
 
   - alias: Start Cleaning Room From Selection
