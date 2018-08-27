@@ -9,6 +9,8 @@
 
 homeassistant:
   customize:
+#    kitchen_main_light_manual_switch:
+#      hidden: true
 
 
 
@@ -27,6 +29,14 @@ group:
       - automation.hallway_light_off_when_no_motion
 
 
+################################################################################
+## Input
+################################################################################
+input_boolean:
+  kitchen_light_disable_auto_off:
+    name: Disable light auto off
+    icon: mdi:lightbulb-outline
+
 
 ################################################################################
 ## Automation
@@ -36,27 +46,48 @@ automation:
 
 # Kitchen lights
 
+#  - alias: kitchen_light_on_when_detect_motion
+##    hide_entity: True
+#    trigger:
+#      platform: state
+#      entity_id: binary_sensor.kitchen_motion_sensor
+#      from: 'off'
+#      to: 'on'
+#    condition:
+#      condition: and
+#      conditions:
+#        - condition: time
+#          before: '01:00:00'
+#        - condition: or
+#          conditions:
+#            - condition: numeric_state
+#              entity_id: sensor.kitchen_illumination
+#              below: 300
+#            - condition: sun
+#              after: sunset
+#              # Optional offset value - in this case it must from -1 hours relative to sunset, or after
+#              after_offset: "-01:00:00"
+#    action:
+#    - service: switch.turn_on
+#      entity_id: switch.kitchen_light_main
+
+
+#  {{states('sensor.kitchen_illumination')|float < 7 }}
+
+
   - alias: kitchen_light_on_when_detect_motion
-#    hide_entity: True
+    #    hide_entity: True
     trigger:
       platform: state
       entity_id: binary_sensor.kitchen_motion_sensor
       from: 'off'
       to: 'on'
     condition:
-      condition: and
-      conditions:
-        - condition: time
-          before: '01:00:00'
-        - condition: or
-          conditions:
-            - condition: numeric_state
-              entity_id: sensor.kitchen_illumination
-              below: 300
-            - condition: sun
-              after: sunset
-              # Optional offset value - in this case it must from -1 hours relative to sunset, or after
-              after_offset: "-01:00:00"
+      - condition: time
+        after: '21:00:00'
+        before: '00:00:00'
+#        - condition: sun
+#          after: sunset
     action:
     - service: switch.turn_on
       entity_id: switch.kitchen_light_main
@@ -67,8 +98,16 @@ automation:
       entity_id: binary_sensor.kitchen_motion_sensor
       from: 'on'
       to: 'off'
-      for:
-        minutes: 5
+#      for:
+#        minutes: 5
+    condition:
+      condition: or
+      conditions:
+      - condition: state
+        entity_id: input_boolean.kitchen_light_disable_auto_off
+        state: 'off'
+      - condition: time
+        after: '01:00:00'
     action:
     - service: switch.turn_off
       entity_id: switch.kitchen_light_main

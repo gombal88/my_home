@@ -50,11 +50,12 @@ living_room:
     - sensor.living_room_temperature
     - sensor.living_room_thermostat_temperature
     - sensor.living_room_humidity
+    - sensor.gateway_xiaomi_illumination
     - binary_sensor.living_room_window_sensor
     - light.gateway_xiaomi
     - vacuum.xiaomi_vacuum
-    - media_player.tv
-    - media_player.googlehome
+#    - media_player.tv
+#    - media_player.googlehome
 
 
 ################################################################################
@@ -107,7 +108,8 @@ kitchen:
     - binary_sensor.kitchen_water_leak_sensor
     - switch.kitchen_light_main
     - switch.kitchen_light_table
-    - media_player.googlehome
+    - input_boolean.kitchen_light_disable_auto_off
+#    - media_player.googlehome
 
 # kitchen_lights:
 #   name: 'Light'
@@ -128,7 +130,7 @@ bathroom:
   entities:
     - sensor.bathroom_heatit_thermostat_temperature
     - binary_sensor.bathroom_water_leak_sensor
-    - media_player.bathroom
+#    - media_player.bathroom
 
 
 ################################################################################

@@ -46,6 +46,7 @@ group:
   system_status:
     name: System Status
     icon: mdi:information
+    control: hidden
     entities:
       - sensor.processor_use
       - sensor.cpu_temp
@@ -60,11 +61,13 @@ group:
   home_assistant_status:
     name: Home Assistant Status
     icon: mdi:information
+    control: hidden
     entities:
       - sensor.installed_ha_version
       - sensor.homeassistant_v2db
       - sensor.ha_uptime
       - sensor.ha_last_reboot
+      - input_boolean.update_homeassistant
       - automation.home_assistant_update_notification
 
   z_wave_devices:
@@ -155,6 +158,25 @@ sensor:
 
 
 ################################################################################
+## Inputs
+################################################################################
+
+input_boolean:
+  update_homeassistant:
+    name: Update Homeassistant
+    icon: mdi:cloud-download
+    initial: off
+
+
+################################################################################
+## Scripts
+################################################################################
+
+shell_command:
+  update_homeassistant: '/bin/bash -c "/home/homeassistant/.homeassistant/scripts/update_homeassistant.sh"'
+
+
+################################################################################
 ## Automation
 ################################################################################
 
@@ -174,3 +196,15 @@ automation:
       data:
         url: 'https://home-assistant.io/blog/'
         # url: '{{ states.updater.updater.attributes.release_notes }}'
+
+- alias: Run update script
+  hide_entity: True
+  trigger:
+  - platform: state
+    entity_id: input_boolean.update_homeassistant
+    to: 'on'
+  action:
+  - service: shell_command.renew_ssl
+  - service: input_boolean.turn_off
+    data:
+      entity_id: input_boolean.update_homeassistant
